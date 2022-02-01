@@ -1,13 +1,13 @@
 //
-//  UserAccountViewController.swift
+//  ByCategories.swift
 //  appDesafio
 //
-//  Created by MacBook on 23/01/22.
+//  Created by MacBook on 26/01/22.
 //
 
 import UIKit
 
-class UserAccountViewController : UIViewController, UITextFieldDelegate  {
+class ByCategoriesViewController : UIViewController {
 
     var tableView : UITableView?
     var dataSource : CatalogObject?
@@ -17,11 +17,9 @@ class UserAccountViewController : UIViewController, UITextFieldDelegate  {
     var byBooksButton : UIButton?
     var byGenreButton : UIButton?
     var byAuthorButton : UIButton?
-    
-    var SearchTextField: UITextField!
-    
-    var SearchPressed : UIButton?
-    
+    var backButton : UIButton?
+    var filter : UIImageView?
+
     var backgroundColor = UIColor(displayP3Red: 0.92, green: 0.92, blue: 0.92, alpha: 1)
     var blue = UIColor(displayP3Red: 0.1, green: 0.1, blue: 0.4, alpha: 1)
     var black = UIColor(displayP3Red: 0.66, green: 0.66, blue: 0.66, alpha: 1)
@@ -29,12 +27,9 @@ class UserAccountViewController : UIViewController, UITextFieldDelegate  {
     var skyBlue = UIColor(displayP3Red: 0.11, green: 0.167, blue: 0.188, alpha: 1)
     var width = UIScreen.main.bounds.width
     var height = UIScreen.main.bounds.height
-    
-    var booksManager =  BooksManager()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        //SearchTextField.delegate = self
 
         view.backgroundColor = backgroundColor
 
@@ -43,9 +38,19 @@ class UserAccountViewController : UIViewController, UITextFieldDelegate  {
     }
 
     func initUI(){
+        
+        filter = UIImageView(frame: CGRect(x: (width/8 * 2) - 10, y: 75, width: 20, height: 40))
+        filter?.image = UIImage(named: "filter")
+        filter?.contentMode = .scaleAspectFit
+        view.addSubview(filter!)
+        
+        backButton = UIButton(frame: CGRect(x: 20, y: 75, width: 40, height: 40))
+        backButton?.setImage(UIImage(named: "previous"), for: .normal)
+        backButton?.addTarget(self, action: #selector(backAction), for: .touchUpInside)
+        view.addSubview(backButton!)
 
         userName = UILabel(frame: CGRect(x: 20, y: 60, width: width, height: 70))
-        userName?.text = "Hola, Juan de Dios"
+        userName?.text = "Filtrado por Géneros"
         userName?.numberOfLines = 1
         userName?.textAlignment = .center
         userName?.font = .boldSystemFont(ofSize: 20)
@@ -61,53 +66,27 @@ class UserAccountViewController : UIViewController, UITextFieldDelegate  {
         searchContent?.layer.cornerRadius = 10
         view.addSubview(searchContent!)
 
-//        byBooksButton = UIButton(frame: CGRect(x: 10, y: 230, width: 100, height: 55))
-//        byBooksButton?.setTitle("Libros", for: .normal)
-//        byBooksButton?.setTitleColor(blue, for: .normal)
-//        byBooksButton?.backgroundColor = .red
-//        byBooksButton?.addTarget(self, action: #selector(byNames), for: .touchUpInside)
-//        view.addSubview(byBooksButton!)
+        byBooksButton = UIButton(frame: CGRect(x: 10, y: 230, width: width/3, height: 55))
+        byBooksButton?.setTitle("Libros", for: .normal)
+        byBooksButton?.setTitleColor(blue, for: .normal)
+        view.addSubview(byBooksButton!)
 
-        byGenreButton = UIButton(frame: CGRect(x: (width/3) + 15, y: 230, width: 100 , height: 55))
+        byGenreButton = UIButton(frame: CGRect(x: 10, y: 230, width: width/3 * 2 + 100, height: 55))
         byGenreButton?.setTitle("Categorias", for: .normal)
         byGenreButton?.setTitleColor(blue, for: .normal)
-        byBooksButton?.backgroundColor = .blue
-        byGenreButton?.addTarget(self, action: #selector(byCategories), for: .touchUpInside)
         view.addSubview(byGenreButton!)
 
-        byAuthorButton = UIButton(frame: CGRect(x: (width/3) + 150, y: 230, width: 100, height: 55))
+        byAuthorButton = UIButton(frame: CGRect(x: 10, y: 230, width: width/3 * 3 + 200, height: 55))
         byAuthorButton?.setTitle("Autores", for: .normal)
         byAuthorButton?.setTitleColor(blue, for: .normal)
-        byAuthorButton?.backgroundColor = .green
-        byAuthorButton?.addTarget(self, action: #selector(byAuthors), for: .touchUpInside)
         view.addSubview(byAuthorButton!)
 
-//        tableView = UITableView(frame: CGRect(x: 10, y: 300, width: width - 20, height: height - 100))
-//        tableView?.backgroundColor = backgroundColor
-//        tableView?.delegate = self
-//        tableView?.dataSource = self
-//
-//        view.addSubview(tableView!)
-        
-        SearchTextField = UITextField(frame: CGRect(x:20, y: 310, width: width - 40, height: 60))
-        SearchTextField!.placeholder = "Encuentra tu libro"
-        SearchTextField!.backgroundColor = gray
-        SearchTextField!.layer.cornerRadius = 7
-        SearchTextField!.layer.borderColor = UIColor.darkGray.cgColor
-        SearchTextField!.layer.borderWidth = 1
-        SearchTextField!.font = UIFont(name: "Helvetica Bold", size: 14)
-        SearchTextField!.textAlignment = .center
-        SearchTextField!.keyboardType = .alphabet
-        view.addSubview(SearchTextField!)
-        
-        SearchPressed = UIButton(frame: CGRect(x:20, y: 390, width: width - 40, height: 60))
-        SearchPressed?.setTitle("Buscar", for: .normal)
-        SearchPressed?.setTitleColor(blue, for: .normal)
-        SearchPressed?.backgroundColor = .lightGray
-        SearchPressed?.addTarget(self, action: #selector(pressed), for: .touchUpInside)
-        view.addSubview(SearchPressed!)
-        
-        
+        tableView = UITableView(frame: CGRect(x: 10, y: 300, width: width - 20, height: height - 100))
+        tableView?.backgroundColor = backgroundColor
+        tableView?.delegate = self
+        tableView?.dataSource = self
+
+        view.addSubview(tableView!)
 
     }
 
@@ -153,47 +132,66 @@ class UserAccountViewController : UIViewController, UITextFieldDelegate  {
 
     }
     
-    @objc func pressed() {
-        SearchTextField.endEditing(true)
-        print("BUSCAR: ", SearchTextField.text!)
-        if let book = SearchTextField.text {
-            booksManager.fetchBook(bookName: book)
-        }
-        SearchTextField.text = ""
+    @objc func backAction(){
+        print("Back")
+        dismiss(animated: true)
     }
     
-
-    
-    @objc func byCategories(){
-        print("Filtrar por categorias")
-        
-        let vc = ByCategoriesViewController()
-
-        vc.modalPresentationStyle = .fullScreen
-        present(vc, animated: true, completion: nil)
-    }
-    
-    @objc func byAuthors(){
-        print("Filtrar por categorias")
-        
-        let vc = ByAuthorViewController()
-
-        vc.modalPresentationStyle = .fullScreen
-        present(vc, animated: true, completion: nil)
-    }
-    
-    @objc func byNames(){
-        print("Filtrar por categorias")
-        
-        let vc = ByNameViewController()
-
-        vc.modalPresentationStyle = .fullScreen
-        present(vc, animated: true, completion: nil)
-    }
 }
 
 
+// MARK: - UITableViewDataSource
+extension ByCategoriesViewController : UITableViewDataSource{
+    ///El numero de celdas por cada seccion
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return dataSource?.genres?[section].books?.count ?? 0
+    }
+
+    ///El tipo de celda que se mostrara
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let book = dataSource?.genres?[indexPath.section].books?[indexPath.row]
+        let cell = CatalogTableViewCell(book: book!)
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return height / 6
+    }
+}
+
+// MARK: - UITableViewDelegate
+extension ByCategoriesViewController : UITableViewDelegate{
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view = UIView() // Aqui definimos el UIView el cual se va a retornar en la funcion
+        view.backgroundColor = backgroundColor// Le asignamos el color random al background de la vista
 
 
 
+        let label = UILabel(frame: CGRect(x: 10, y: 0, width: width, height: 20))
+        label.text = dataSource?.genres?[section].name ?? ""
+        label.textColor = .black
+        label.font = .boldSystemFont(ofSize: 20)
+        view.addSubview(label)
 
+        return view
+   }
+
+    ///Cacha el Clik en cada celda para alguna accion
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("Estoy en la seccion \(indexPath.section) en la celda \(indexPath.row)")
+
+        //let product = dataSoruce?.categorias?[indexPath.section].productos?[indexPath.row]
+
+        let vc = DetailProductViewController()
+
+        vc.modalPresentationStyle = .fullScreen
+        present(vc, animated: true, completion: nil)
+    }
+
+    ///Numero de secciones que vamos a usar
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return dataSource?.genres?.count ?? 0
+    }
+
+}

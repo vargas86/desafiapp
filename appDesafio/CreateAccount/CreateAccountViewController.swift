@@ -18,6 +18,7 @@ class CreateAccountViewController : UIViewController {
     var passwordTextField : UITextField?
     var confirmPasswordTextField : UITextField?
     var createButton : UIButton?
+    var logo : UIImageView?
     
     var message : MessageOptionView?
     var labelMessage : LabelMessageOptionView?
@@ -37,6 +38,11 @@ class CreateAccountViewController : UIViewController {
     }
     
     func initUI(){
+        
+        logo = UIImageView(frame: CGRect(x: 20, y: 60, width: width, height: 70))
+        logo?.image = UIImage(named: "book")
+        logo?.contentMode = .scaleAspectFit
+        view.addSubview(logo!)
         
         ownContent = UIView(frame: CGRect(x: 20, y: 230, width: width - 40, height: height/2 - 50))
         ownContent?.backgroundColor = .white
@@ -90,6 +96,7 @@ class CreateAccountViewController : UIViewController {
         
         passwordTextField = UITextField(frame: CGRect(x:40, y: 470, width: width - 80, height: 60))
         passwordTextField?.placeholder = "Crear una contraseña"
+        passwordTextField?.isSecureTextEntry = true
         passwordTextField?.backgroundColor = .white
         passwordTextField?.layer.cornerRadius = 7
         passwordTextField?.layer.borderColor = UIColor.darkGray.cgColor
@@ -104,6 +111,7 @@ class CreateAccountViewController : UIViewController {
         
         confirmPasswordTextField = UITextField(frame: CGRect(x:40, y: 550, width: width - 80, height: 60))
         confirmPasswordTextField?.placeholder = "Vuelve a escribir tu contraseña"
+        confirmPasswordTextField?.isSecureTextEntry = true
         confirmPasswordTextField?.backgroundColor = .white
         confirmPasswordTextField?.layer.cornerRadius = 7
         confirmPasswordTextField?.layer.borderColor = UIColor.darkGray.cgColor
@@ -120,17 +128,29 @@ class CreateAccountViewController : UIViewController {
         createButton?.backgroundColor = blue
         createButton?.layer.cornerRadius = 20
         createButton?.setTitle("CREAR CUENTA", for: .normal)
-        createButton?.addTarget(self, action: #selector(logInAction), for: .touchUpInside)
+        createButton?.addTarget(self, action: #selector(createNewAccount), for: .touchUpInside)
         view.addSubview(createButton!)
     }
     
-    @objc func logInAction(){
-        print("INICIAR SESION")
-        
-        let vc = UserAccountViewController()
+//    @objc func logInAction(){
+//        print("INICIAR SESION")
+//
+//        let vc = UserAccountViewController()
+//
+//        vc.modalPresentationStyle = .fullScreen
+//        present(vc, animated: true, completion: nil)
+//    }
+    
+    @IBAction func createNewAccount(_ sender: Any){
+        if ( UsuarioTextField?.text?.isEmpty)! || (emailTextField?.text?.isEmpty)! || (passwordTextField?.text?.isEmpty)! || (confirmPasswordTextField?.text?.isEmpty)!  {
+                  print("Llena todos los campos requeridos")
+               } else {
+                   let vc = UserAccountViewController()
 
-        vc.modalPresentationStyle = .fullScreen
-        present(vc, animated: true, completion: nil)
+                   vc.modalPresentationStyle = .fullScreen
+                   present(vc, animated: true, completion: nil)
+               }
     }
     
 }
+
