@@ -7,20 +7,56 @@
 
 import Foundation
 
-struct BooksData : Codable {
-    
-    var data: [Data]
+// MARK: - BooksData
+struct BooksData: Codable {
+    let data: [Datum]
 }
 
-struct Data : Codable {
-    
-    var id: String
-    var attributes : [Attributes]
+// MARK: - Datum
+struct Datum: Codable {
+    let type, id: String
+    let attributes: Attributes
+    let relationships: Relationships
+    let links: DatumLinks
 }
 
+// MARK: - Attributes
 struct Attributes: Codable {
-    var title: String
-    var slug: String
-    var content: String
+    let title, slug, content: String
+    let createdAt, updatedAt: Date
+
+    enum CodingKeys: String, CodingKey {
+        case title, slug, content
+        case createdAt = "created-at"
+        case updatedAt = "updated-at"
+    }
 }
 
+// MARK: - DatumLinks
+struct DatumLinks: Codable {
+    let linksSelf: String
+
+    enum CodingKeys: String, CodingKey {
+        case linksSelf = "self"
+    }
+}
+
+// MARK: - Relationships
+struct Relationships: Codable {
+    let authors, categories: Authors
+}
+
+// MARK: - Authors
+struct Authors: Codable {
+    let links: AuthorsLinks
+}
+
+// MARK: - AuthorsLinks
+struct AuthorsLinks: Codable {
+    let linksSelf, related: String
+
+    enum CodingKeys: String, CodingKey {
+        case linksSelf = "self"
+        case related
+    }
+}

@@ -8,11 +8,11 @@
 import Foundation
 
 struct BooksManager {
-    let bookUrl = "https://playground-bookstore.herokuapp.com/api/v1/books"
+    let bookUrl = "https://playground-bookstore.herokuapp.com/api/v1/categories"
    
     
     func fetchBook(bookName: String) {
-        let urlString = "\(bookUrl)"
+        let urlString = "\(bookUrl)?q=\(bookName)"
         perfomRequest(urlString: urlString)
     }
     
@@ -21,18 +21,24 @@ struct BooksManager {
         
         //1.Crear un URL
         if let url = URL(string: urlString) {
-            //2. Create a URLSession
             
+            //2. Create a URLSession
             let session = URLSession(configuration: .default)
+            
+            
             //3. Darle la session una tarea
             let task = session.dataTask(with: url) {(data, response, error)
                 in
                 if error != nil{
-                    print(error)
+                    print("ESTO ES UN ERROR", error as Any)
                     return
                 }
                 if let safeData = data {
                     self.parseJSON(booksData: safeData)
+                    let dataString = String(data: safeData,encoding: .utf8)
+                    let book = dataString!
+                    print(book)
+                    
                   
                 }
                 
@@ -48,9 +54,11 @@ struct BooksManager {
             let decodedData = try decoder.decode(BooksData.self, from: booksData)
 
             print(decodedData.data)
+           
 
 
-            
+
+
         } catch {
             print(error)
         }
